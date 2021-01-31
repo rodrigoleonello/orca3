@@ -12,6 +12,7 @@ cam_hole_d = 1.8;
 cam_hole_r = cam_hole_d / 2;
 cam_hole_x = cam_x / 2 - cam_hole_edge;
 cam_hole_y = cam_y / 2 - cam_hole_edge;
+cam_holes = [for (i = [- cam_hole_x, cam_hole_x - 7], j = [- cam_hole_y, cam_hole_y]) [i, j]];
 
 // Components, see pcb.scad::pcb_component()
 csi_socket = [4, 20, 1.8, "Ivory"];
@@ -30,10 +31,10 @@ module pi_camera_0() {
 module pi_camera() {
   color("LimeGreen") difference() {
     pcb(cam_x, cam_y, cam_z, cam_corner_r);
-    pcb_hole(cam_hole_x - 7, cam_hole_y, cam_hole_r, cam_z);  // Holes avoid the CSI connector
-    pcb_hole(cam_hole_x - 7, - cam_hole_y, cam_hole_r, cam_z);
-    pcb_hole(- cam_hole_x, cam_hole_y, cam_hole_r, cam_z);
-    pcb_hole(- cam_hole_x, - cam_hole_y, cam_hole_r, cam_z);
+
+    for (cam_hole = cam_holes) {
+      pcb_hole(cam_hole[0], cam_hole[1], cam_hole_r, cam_z);
+    }
   }
 
   pcb_component(csi_socket, 9, 0);

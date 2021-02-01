@@ -1,16 +1,3 @@
-# OpenSCAD files
-
-How these files are organized:
-
-* `scad/include/` contains modules and constants
-  * `pcb.scad` contains modules and constants for creating PCB mockups
-  * `adafruit.scad` contains mockups of Adafruit parts
-  * `blue_robotics.scad` contains mockups of Blue Robotics parts
-  * etc.
-* `scad/` contains things that render
-  * there is a file for every printable part, ready for printing
-  * there are a bunch of files for debugging, such as `scad/external_camera.scad`
-
 # External cameras
 
 The down-facing stereo camera is made up of two camera assemblies mounted to the sides of the AUV.
@@ -35,3 +22,18 @@ Printed parts:
 * Mounting bracket: TODO
 
 Software: TODO
+
+# OpenSCAD files
+
+How these files are organized:
+
+* `scad/include/` contains modules and constants, including:
+  * `pcb.scad` contains modules and constants for creating PCB vitamins (_vitamins_ are non-printable parts in RepRap terminology)
+  * `adafruit.scad` contains Adafruit vitamins
+  * `blue_robotics.scad` contains Blue Robotics vitamins
+  * `pi_camera.scad` Pi Camera V1.2 vitamin
+  * `pi_zero.scad` Pi Zero W vitamin
+  * `printables.scad` contains printable parts
+* `scad/` contains things that render
+  * there is a file for every printable part, ready for printing
+  * there are a bunch of files for debugging, such as `scad/external_camera.scad`

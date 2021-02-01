@@ -18,6 +18,7 @@ pi_hole_d = 2.75;
 pi_hole_r = pi_hole_d / 2;
 pi_hole_x = pi_x / 2 - pi_hole_edge;
 pi_hole_y = pi_y / 2 - pi_hole_edge;
+pi_holes = [for (i = [- pi_hole_x, pi_hole_x], j = [- pi_hole_y, pi_hole_y]) [i, j]];
 
 // Components, see pcb.scad::pcb_component()
 csi_socket = [3, 17, 1.3, "Ivory"];
@@ -44,8 +45,8 @@ module pi_zero_body() {
     pcb(pi_x, pi_y, pi_z, pi_corner_r);
 
     // Corner screw holes
-    for (i = [- pi_hole_x, pi_hole_x], j = [- pi_hole_y, pi_hole_y]) {
-      pcb_hole(i, j, pi_hole_r, pi_z) ;
+    for (pi_hole = pi_holes) {
+      pcb_hole(pi_hole.x, pi_hole.y, pi_hole_r, pi_z);
     }
 
     // GPIO header holes

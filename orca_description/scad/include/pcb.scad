@@ -36,12 +36,12 @@ module pcb_hole(x, y, r, board_h = 1.5) {
 }
 
 // Component that sits on top of the pcb
-// TODO support bottom mounted components
+// Future: support bottom mounted components
 module pcb_component(spec, x, y, yaw = 0.0, board_h = 1.5) {
   color(spec[3])
     translate([x, y, board_h + spec[2] / 2])
       rotate([0, 0, yaw])
-        cube([spec[0], spec[1], spec[2]], center = true);
+        cube([spec.x, spec.y, spec.z], center = true);
 }
 
 // Header (base + pin)

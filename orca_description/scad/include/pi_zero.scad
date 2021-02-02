@@ -2,7 +2,7 @@ include <pcb.scad>
 
 // Options
 show_pi = true;
-show_gpio_header = 1;  // 0 = no headers, 1 = above, -1 = below
+show_gpio_header = 0;  // 0 = no headers, 1 = above, -1 = below
 show_extra_header = false;  // 2x2 header for reset switch and RCA composite video
 
 // PCB
@@ -41,7 +41,7 @@ module pi_zero() {
 
 // Just Pi body
 module pi_zero_body() {
-  color("LimeGreen") difference() {
+  color("#038f3f") difference() {
     pcb(pi_x, pi_y, pi_z, pi_corner_r);
 
     // Corner screw holes

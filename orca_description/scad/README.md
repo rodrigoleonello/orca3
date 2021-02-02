@@ -17,8 +17,10 @@ Each camera assembly consists of the following:
 * LED and a 100 ohm resistor
 
 Printed parts:
-* Electronics sled: `scad/sled.scad`
-* Top and bottom brackets holding everything in place in the tube: `scad/bracket.scad`
+* Power tray: `scad/power_tray.scad`
+* Pi tray: `scad/pi_tray.scad`
+* Camera bracket: `scad/cam_bracket.scad`
+* Penetration bracket: `scad/pen_bracket.scad`
 * Mounting bracket: TODO
 
 Software: TODO

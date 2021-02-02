@@ -13,7 +13,7 @@ battery_h = 69;
 // Adafruit Powerboost 1000 Charger
 // https://www.adafruit.com/product/2465
 module power_boost() {
-  color("#0232c3") difference() {
+  color("#065daa") difference() {
     pcb(36.2, 22.86);
 
     for (pb_hole = pb_holes) {
@@ -28,5 +28,5 @@ module power_boost() {
 // Adafruit Lithium Ion Cylindrical Battery - 3.7v 2200mAh
 // https://www.adafruit.com/product/1781
 module battery() {
-  color("#5252b4") cylinder(h = battery_h, r = battery_r);
+  color("#02a5fe") cylinder(h = battery_h, r = battery_r);
 }

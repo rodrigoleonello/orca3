@@ -40,7 +40,7 @@ module pi_camera_0() {
 }
 
 module pi_camera() {
-  color("LimeGreen") difference() {
+  color("#038f3f") difference() {
     pcb(cam_x, cam_y, cam_z, cam_corner_r);
 
     for (cam_hole = cam_holes) {

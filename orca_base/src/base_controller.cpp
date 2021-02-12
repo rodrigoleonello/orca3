@@ -1,25 +1,3 @@
-// MIT License
-//
-// Copyright (c) 2021 Clyde McQueen
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
 #include <memory>
 
 #include "nav_msgs/msg/odometry.hpp"
@@ -47,7 +25,7 @@ constexpr int QUEUE_SIZE = 10;
 class BaseController : public rclcpp::Node
 {
   BaseContext cxt_;
-  orca::Barometer barometer_;
+  // orca::Barometer barometer_;
   Thrusters thrusters_;
 
   // Most recent incoming velocity message
@@ -56,18 +34,20 @@ class BaseController : public rclcpp::Node
   // Current pose
   UnderwaterMotion underwater_motion_;
 
+  std::unique_ptr<pid::Controller> pid_x_;
+  std::unique_ptr<pid::Controller> pid_y_;
   std::unique_ptr<pid::Controller> pid_z_;
 
   rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmd_vel_sub_;
-  rclcpp::Subscription<orca_msgs::msg::Barometer>::SharedPtr baro_sub_;
+  // rclcpp::Subscription<orca_msgs::msg::Barometer>::SharedPtr baro_sub_;
 
   rclcpp::Publisher<geometry_msgs::msg::AccelStamped>::SharedPtr accel_pub_;
   rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr vel_pub_;
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr pose_pub_;
-  rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_pub_;
+  // rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_pub_;
   rclcpp::Publisher<orca_msgs::msg::Thrust>::SharedPtr thrust_pub_;
 
-  std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+  // std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
 
   void validate_parameters()
   {
@@ -98,44 +78,44 @@ class BaseController : public rclcpp::Node
     CXT_MACRO_CHECK_CMDLINE_PARAMETERS((*this), BASE_ALL_PARAMS)
   }
 
-  void publish_odometry()
-  {
-    if (accel_pub_->get_subscription_count() > 0) {
-      accel_pub_->publish(underwater_motion_.accel_stamped());
-    }
-    if (vel_pub_->get_subscription_count() > 0) {
-      vel_pub_->publish(underwater_motion_.vel_stamped());
-    }
-    if (pose_pub_->get_subscription_count() > 0) {
-      pose_pub_->publish(underwater_motion_.pose_stamped());
-    }
-    if (odom_pub_->get_subscription_count() > 0) {
-      odom_pub_->publish(underwater_motion_.odometry());
-    }
-    if (cxt_.publish_tf_) {
-      tf_broadcaster_->sendTransform(underwater_motion_.transform_stamped());
-    }
-  }
+  // void publish_odometry()
+  // {
+  //   if (accel_pub_->get_subscription_count() > 0) {
+  //     accel_pub_->publish(underwater_motion_.accel_stamped());
+  //   }
+  //   if (vel_pub_->get_subscription_count() > 0) {
+  //     vel_pub_->publish(underwater_motion_.vel_stamped());
+  //   }
+  //   if (pose_pub_->get_subscription_count() > 0) {
+  //     pose_pub_->publish(underwater_motion_.pose_stamped());
+  //   }
+  //   if (odom_pub_->get_subscription_count() > 0) {
+  //     odom_pub_->publish(underwater_motion_.odometry());
+  //   }
+  //   if (cxt_.publish_tf_) {
+  //     tf_broadcaster_->sendTransform(underwater_motion_.transform_stamped());
+  //   }
+  // }
 
-  void publish_thrust(orca_msgs::msg::Barometer::ConstSharedPtr baro_msg)
+  void publish_thrust()
   {
     if (thrust_pub_->get_subscription_count() > 0) {
-      auto dt = 1. / cxt_.controller_frequency_;
+      // auto dt = 1. / cxt_.controller_frequency_;
       auto pose = underwater_motion_.pose_stamped();
       auto thrust = underwater_motion_.thrust();
 
       // Add hover thrust
-      if (cxt_.hover_thrust_) {
-        thrust.force.z += cxt_.hover_force_z();
-      }
+      // if (cxt_.hover_thrust_) {
+      //   thrust.force.z += cxt_.hover_force_z();
+      // }
 
       // Add PID thrust
-      if (cxt_.pid_enabled_) {
-        pid_z_->set_target(pose.pose.position.z);
-        auto curr_z = barometer_.pressure_to_base_link_z(cxt_, baro_msg->pressure);
-        auto accel_z = pid_z_->calc(curr_z, dt);
-        thrust.force.z += cxt_.accel_to_force(accel_z);
-      }
+      // if (cxt_.pid_enabled_) {
+      //   pid_z_->set_target(pose.pose.position.z);
+      //   auto curr_z = barometer_.pressure_to_base_link_z(cxt_, baro_msg->pressure);
+      //   auto accel_z = pid_z_->calc(curr_z, dt);
+      //   thrust.force.z += cxt_.accel_to_force(accel_z);
+      // }
 
       // Scale by bollard force, clamp to [-1, 1]
       auto effort = cxt_.wrench_to_effort(thrust);
@@ -147,7 +127,7 @@ class BaseController : public rclcpp::Node
       if (saturated) {
         RCLCPP_WARN(get_logger(), "thruster(s) saturated");
       }
-      thrust_msg.header.stamp = pose.header.stamp;
+      thrust_msg.header.stamp = pose.header.stamp; // TODO Analisar a questão do timestamp da sample
       thrust_pub_->publish(thrust_msg);
     }
   }
@@ -158,16 +138,16 @@ public:
   {
     // Suppress IDE warnings
     (void) cmd_vel_sub_;
-    (void) baro_sub_;
+    // (void) baro_sub_;
 
-    tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(this);
+    // tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(this);
 
     init_parameters();
 
-    accel_pub_ = create_publisher<geometry_msgs::msg::AccelStamped>("accel", QUEUE_SIZE);
-    vel_pub_ = create_publisher<geometry_msgs::msg::TwistStamped>("vel", QUEUE_SIZE);
-    pose_pub_ = create_publisher<geometry_msgs::msg::PoseStamped>("pose", QUEUE_SIZE);
-    odom_pub_ = create_publisher<nav_msgs::msg::Odometry>("odom", QUEUE_SIZE);
+    // accel_pub_ = create_publisher<geometry_msgs::msg::AccelStamped>("accel", QUEUE_SIZE);
+    // vel_pub_ = create_publisher<geometry_msgs::msg::TwistStamped>("vel", QUEUE_SIZE);
+    // pose_pub_ = create_publisher<geometry_msgs::msg::PoseStamped>("pose", QUEUE_SIZE);
+    // odom_pub_ = create_publisher<nav_msgs::msg::Odometry>("odom", QUEUE_SIZE);
     thrust_pub_ = create_publisher<orca_msgs::msg::Thrust>("thrust", QUEUE_SIZE);
 
     cmd_vel_sub_ = create_subscription<geometry_msgs::msg::Twist>(
@@ -175,33 +155,38 @@ public:
       [this](geometry_msgs::msg::Twist::ConstSharedPtr msg) // NOLINT
       {
         cmd_vel_ = *msg;
+        rclcpp::Time t;
+        t = now();
+        underwater_motion_.update(t, cmd_vel_);
+        publish_thrust();
+
       });
 
     // Barometer messages are continuous and reliable, use them to drive the control loop
-    baro_sub_ = create_subscription<orca_msgs::msg::Barometer>(
-      "barometer", QUEUE_SIZE,
-      [this](orca_msgs::msg::Barometer::ConstSharedPtr msg) // NOLINT
-      {
-        if (!barometer_.initialized()) {
-          // Calibrate the barometer so that baro.z = odom.z = 0 at this pressure
-          // Note that this can only be set once -- parameter changes will not affect PID control
-          barometer_.initialize(cxt_, msg->pressure, 0);
-          RCLCPP_INFO(get_logger(), "baro.z = odom.z = 0 at pressure %g", msg->pressure);
-        }
+    // baro_sub_ = create_subscription<orca_msgs::msg::Barometer>(
+    //   "barometer", QUEUE_SIZE,
+    //   [this](orca_msgs::msg::Barometer::ConstSharedPtr msg) // NOLINT
+    //   {
+    //     if (!barometer_.initialized()) {
+    //       // Calibrate the barometer so that baro.z = odom.z = 0 at this pressure
+    //       // Note that this can only be set once -- parameter changes will not affect PID control
+    //       barometer_.initialize(cxt_, msg->pressure, 0);
+    //       RCLCPP_INFO(get_logger(), "baro.z = odom.z = 0 at pressure %g", msg->pressure);
+    //     }
 
-        rclcpp::Time t(msg->header.stamp);
+    //     rclcpp::Time t(msg->header.stamp);
 
-        // Overwrite stamp, useful if we're running a simulation on wall time
-        if (cxt_.stamp_msgs_with_current_time_) {
-          t = now();
-        }
+    //     // Overwrite stamp, useful if we're running a simulation on wall time
+    //     if (cxt_.stamp_msgs_with_current_time_) {
+    //       t = now();
+    //     }
 
-        underwater_motion_.update(t, cmd_vel_);
+    //     underwater_motion_.update(t, cmd_vel_);
 
-        publish_odometry();
-        publish_thrust(msg);
-      });
-
+    //     // publish_odometry();
+    //     publish_thrust(msg);
+    //   });
+    
     RCLCPP_INFO(get_logger(), "base_controller ready");
   }
 };

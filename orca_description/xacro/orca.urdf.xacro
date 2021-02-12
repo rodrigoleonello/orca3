@@ -34,40 +34,38 @@
           DISPLACED_MASS = TOTAL_VOLUME * FLUID_DENSITY = 9.97
           TOTAL_MASS = 9.9
    -->
-  <xacro:property name="TOTAL_MASS" value="9.9"/>
-  <xacro:property name="TOTAL_VOLUME" value="0.01"/>
-  <xacro:property name="LENGTH" value="0.457"/>
-  <xacro:property name="WIDTH" value="0.338"/>
-  <xacro:property name="HEIGHT" value="0.25"/>
-  <xacro:property name="IXX" value="${TOTAL_MASS / 12 * (WIDTH * WIDTH + HEIGHT * HEIGHT)}"/>
+  <xacro:property name="TOTAL_MASS" value="14.25"/>
+  <xacro:property name="TOTAL_VOLUME" value="0.0144"/>
+  <xacro:property name="LENGTH" value="0.550"/>
+  <xacro:property name="WIDTH" value="0.364"/>
+  <xacro:property name="HEIGHT" value="0.270"/>
+  <!-- <xacro:property name="IXX" value="${TOTAL_MASS / 12 * (WIDTH * WIDTH + HEIGHT * HEIGHT)}"/>
   <xacro:property name="IYY" value="${TOTAL_MASS / 12 * (LENGTH * LENGTH + HEIGHT * HEIGHT)}"/>
-  <xacro:property name="IZZ" value="${TOTAL_MASS / 12 * (LENGTH * LENGTH + WIDTH * WIDTH)}"/>
-  <xacro:property name="FLOAT_X" value="0.12"/>
+  <xacro:property name="IZZ" value="${TOTAL_MASS / 12 * (LENGTH * LENGTH + WIDTH * WIDTH)}"/> -->
+  <xacro:property name="IXX" value="0.15166"/>
+  <xacro:property name="IYY" value="0.068878"/>
+  <xacro:property name="IZZ" value="0.13818"/>
+  <!-- <xacro:property name="FLOAT_X" value="0.12"/>
   <xacro:property name="FLOAT_Y" value="0.11"/>
-  <xacro:property name="FLOAT_Z" value="0.07"/>
-  <xacro:property name="THRUSTER_X" value="0.15"/>
-  <xacro:property name="THRUSTER_Y" value="0.09"/>
-  <xacro:property name="THRUSTER_Z" value="-0.009"/>
-  <xacro:property name="VERT_THRUSTER_Y" value="0.105"/>
-  <xacro:property name="VERT_THRUSTER_Z" value="0.09"/>
-  <xacro:property name="MASS_Z" value="0.011"/>
-  <xacro:property name="VOLUME_Z" value="0.06"/>
-  <xacro:property name="FORWARD_FORCE" value="50"/>
-  <xacro:property name="REVERSE_FORCE" value="40"/>
-  <xacro:property name="HAS_TETHER" default="false"/>
-  <xacro:property name="SURFACE" default="0"/>
-  <xacro:property name="STEREO_BASELINE" default="0.36"/>
+  <xacro:property name="FLOAT_Z" value="0.07"/> -->
+  <xacro:property name="THRUSTER_X" value="0.18"/> <!-- posição do thruster em relação ao baselink/centro de massa -->
+  <xacro:property name="THRUSTER_Y" value="0.12"/> <!-- posição do thruster em relação ao baselink/centro de massa -->
+  <xacro:property name="THRUSTER_Z" value="0.023"/> <!-- posição do thruster em relação ao baselink/centro de massa -->
+  <xacro:property name="VERT_THRUSTER_Y" value="0.125"/> <!-- posição do thruster em relação ao baselink/centro de massa -->
+  <xacro:property name="VERT_THRUSTER_Z" value="0.175"/> <!-- posição do thruster em relação ao baselink/centro de massa -->
+  <xacro:property name="MASS_Z" value="0.076"/> <!-- fazer estudo de drag force -->
+  <xacro:property name="VOLUME_Z" value="0.094"/> <!-- vol do bouyance/já está calculado? --> 
+  <xacro:property name="FORWARD_FORCE" value="50"/> <!-- parametro do thruster escolhido/força no sentido positivo (N) --> 
+  <xacro:property name="REVERSE_FORCE" value="40"/> <!-- parametro do thruster escolhido/força no sentido negativo (N) --> 
+  <xacro:property name="HAS_TETHER" default="false"/> <!-- vamos considerar cabos? --> 
+  <xacro:property name="SURFACE" default="0"/> <!-- manter o mesmo --> 
+  <xacro:property name="STEREO_BASELINE" default="0.36"/> <!-- nao vamos utilizar -->
+
+  <!-- Mesh file -->
+  <xacro:property name="mesh_file" value="file://$(find orca_description)/meshes/base_link.STL"/>
 
   <!-- Physics properties -->
   <xacro:property name="FLUID_DENSITY" value="997"/>
-
-  <!-- Sensor properties -->
-  <xacro:property name="BARO_FREQ" value="20.0"/>
-  <xacro:property name="BARO_VAR" value="40682.89"/>
-  <xacro:property name="FWD_CAMERA_FREQ" value="1.0"/> <!-- Hack: slow down updates -->
-  <xacro:property name="DOWN_CAMERA_FREQ" value="30.0"/>
-  <xacro:property name="CAMERA_STD_DEV" value="0.07"/>
-  <xacro:property name="CAMERA_FAR_CLIP" value="10"/>
 
   <!-- General constants -->
   <xacro:property name="PI" value="3.1415926535897931"/>
@@ -147,178 +145,32 @@
   <link name="base_link">
     <!-- Inertial -->
     <inertial>
-      <origin xyz="0 0 ${MASS_Z}"/> <!-- Center of mass -->
+      <origin xyz="0 0 ${MASS_Z}" rpy="0 0 0"/> <!-- Center of mass -->
       <mass value="${TOTAL_MASS}"/>
       <inertia ixx="${IXX}" ixy="0.0" ixz="0.0" iyy="${IYY}" iyz="0.0" izz="${IZZ}"/>
     </inertial>
-    <!-- Float -->
     <visual>
-      <origin xyz="${FLOAT_X} ${FLOAT_Y} ${FLOAT_Z}"/>
+      <origin
+        xyz="0 0 0" rpy="0 0 1.57" />
       <geometry>
-        <box size="0.15 0.09 0.08"/>
+        <mesh
+          filename="${mesh_file}" />
       </geometry>
-      <material name="blue"/>
+      <material
+        name="">
+        <color
+          rgba="0.49804 0.49804 0.49804 1" />
+      </material>
     </visual>
-    <!-- Float -->
-    <visual>
-      <origin xyz="${FLOAT_X} ${-FLOAT_Y} ${FLOAT_Z}"/>
-      <geometry>
-        <box size="0.15 0.09 0.08"/>
-      </geometry>
-    </visual>
-    <!-- Float -->
-    <visual>
-      <origin xyz="${-FLOAT_X} ${FLOAT_Y} ${FLOAT_Z}"/>
-      <geometry>
-        <box size="0.15 0.09 0.08"/>
-      </geometry>
-    </visual>
-    <!-- Float -->
-    <visual>
-      <origin xyz="${-FLOAT_X} ${-FLOAT_Y} ${FLOAT_Z}"/>
-      <geometry>
-        <box size="0.15 0.09 0.08"/>
-      </geometry>
-    </visual>
-    <!-- Electronics tube -->
-    <visual>
-      <origin xyz="0 0 0.063" rpy="0 ${PI/2} 0"/>
-      <geometry>
-        <cylinder length="0.32" radius="0.055"/>
-      </geometry>
-    </visual>
-    <!-- Battery tube -->
-    <visual>
-      <origin xyz="0 0 -0.05" rpy="0 ${PI/2} 0"/>
-      <geometry>
-        <cylinder length="0.25" radius="0.045"/>
-      </geometry>
-    </visual>
-    <!-- Left down-facing camera tube -->
-    <visual>
-      <origin xyz="-0.15 ${STEREO_BASELINE/2} 0" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.135" radius="0.0275"/>
-      </geometry>
-    </visual>
-    <!-- Right down-facing camera tube -->
-    <visual>
-      <origin xyz="-0.15 ${-STEREO_BASELINE/2} 0" rpy="0 0 0"/>
-      <geometry>
-        <cylinder length="0.135" radius="0.0275"/>
-      </geometry>
-    </visual>
-    <!-- Collision region -->
     <collision>
+      <origin
+        xyz="0 0 0" rpy="0 0 1.57" />
       <geometry>
-        <box size="${LENGTH} ${WIDTH} ${HEIGHT}"/>
+        <mesh
+          filename="${mesh_file}" />
       </geometry>
     </collision>
   </link>
-
-  <!-- Barometer link -->
-  <link name="baro_link">
-    <visual>
-      <origin xyz="0 0 0" rpy="0 ${PI/2} 0"/>
-      <geometry>
-        <cylinder length="0.01" radius="0.01"/>
-      </geometry>
-      <material name="red"/>
-    </visual>
-  </link>
-
-  <!-- Attach baro_link to base_link -->
-  <joint name="baro_joint" type="fixed">
-    <origin xyz="-0.16 0 0.05" rpy="0 0 0"/>
-    <parent link="base_link"/>
-    <child link="baro_link"/>
-  </joint>
-
-  <!-- Forward camera link -->
-  <link name="forward_camera_link">
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <sphere radius="0.052"/>
-      </geometry>
-      <material name="red"/>
-    </visual>
-  </link>
-
-  <!-- Attach forward_camera_link to base_link -->
-  <joint name="forward_camera_joint" type="fixed">
-    <origin xyz="0.16 0 0.063" rpy="0 0 0"/>
-    <parent link="base_link"/>
-    <child link="forward_camera_link"/>
-  </joint>
-
-  <!-- Forward camera frame -->
-  <link name="forward_camera_frame"/>
-
-  <!-- Attach forward_camera_frame to base_link (parsed by filter_node) -->
-  <joint name="forward_camera_frame_joint" type="fixed">
-    <origin xyz="0.16 0 0.063" rpy="${-PI/2} 0 ${-PI/2}"/>
-    <parent link="base_link"/>
-    <child link="forward_camera_frame"/>
-  </joint>
-
-  <!-- Left camera link -->
-  <link name="left_camera_link">
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <!-- Make the aspect ratio obvious -->
-        <box size="0.01 0.04 0.03"/>
-      </geometry>
-      <material name="red"/>
-    </visual>
-  </link>
-
-  <!-- Attach left_camera_link to base_link -->
-  <joint name="left_camera_joint" type="fixed">
-    <origin xyz="-0.15 0.18 -0.0675" rpy="0 ${PI/2} 0"/>
-    <parent link="base_link"/>
-    <child link="left_camera_link"/>
-  </joint>
-
-  <!-- Left camera frame -->
-  <link name="left_camera_frame"/>
-
-  <!-- Attach left_camera_frame to base_link -->
-  <joint name="left_camera_frame_joint" type="fixed">
-    <origin xyz="-0.15 0.18 -0.0675" rpy="${PI} 0 ${-PI/2}"/>
-    <parent link="base_link"/>
-    <child link="left_camera_frame"/>
-  </joint>
-
-  <!-- Right camera link -->
-  <link name="right_camera_link">
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0"/>
-      <geometry>
-        <!-- Make the aspect ratio obvious -->
-        <box size="0.01 0.04 0.03"/>
-      </geometry>
-      <material name="red"/>
-    </visual>
-  </link>
-
-  <!-- Attach right_camera_link to base_link -->
-  <joint name="right_camera_joint" type="fixed">
-    <origin xyz="-0.15 -0.18 -0.0675" rpy="0 ${PI/2} 0"/>
-    <parent link="base_link"/>
-    <child link="right_camera_link"/>
-  </joint>
-
-  <!-- Right camera frame -->
-  <link name="right_camera_frame"/>
-
-  <!-- Attach right_camera_frame to base_link -->
-  <joint name="right_camera_frame_joint" type="fixed">
-    <origin xyz="-0.15 -0.18 -0.0675" rpy="${PI} 0 ${-PI/2}"/>
-    <parent link="base_link"/>
-    <child link="right_camera_frame"/>
-  </joint>
 
   <!-- Attach thrusters to the base_link -->
   <xacro:t200 name="front_right">
@@ -405,135 +257,6 @@
           <xacro:insert_block name="vertical_left_origin"/>
         </thruster>
       </plugin>
-    </gazebo>
-  </xacro:if>
-
-  <!-- The OrcaBarometerPlugin (wraps a Gazebo altimeter sensor) simulates a barometer sensor such
-       as the BlueRobotics Bar30. -->
-  <xacro:if value="${BAROMETER_PLUGIN}">
-    <gazebo reference="baro_link">
-      <sensor name="barometer_sensor" type="altimeter">
-        <update_rate>${BARO_FREQ}</update_rate>
-        <plugin name="OrcaBarometerPlugin" filename="libOrcaBarometerPlugin.so">
-          <fluid_density>${FLUID_DENSITY}</fluid_density>
-          <baro_link_to_base_link_z_>0.05</baro_link_to_base_link_z_>
-          <variance>${BARO_VAR}</variance>
-        </plugin>
-      </sensor>
-    </gazebo>
-  </xacro:if>
-
-  <!-- The camera_controller plugin (wraps a Gazebo camera sensor) simulates a camera driver.
-       This xacro macro attaches a camera to ${prefix}_camera_link: -->
-  <xacro:macro name="camera_plugin" params="prefix width height horizontal_fov">
-    <gazebo reference="${prefix}_camera_link">
-      <sensor type="camera" name="${prefix}_camera">
-        <update_rate>${FWD_CAMERA_FREQ}</update_rate>
-        <camera name="head">
-          <horizontal_fov>${horizontal_fov}</horizontal_fov>
-          <image>
-            <width>${width}</width>
-            <height>${height}</height>
-            <format>R8G8B8</format>
-          </image>
-          <clip>
-            <near>0.02</near>
-            <far>${CAMERA_FAR_CLIP}</far>
-          </clip>
-          <noise>
-            <type>gaussian</type>
-            <!-- Noise is sampled independently per pixel on each frame.
-                 That pixel's noise value is added to each of its color
-                 channels, which at that point lie in the range [0,1]. -->
-            <mean>0.0</mean>
-            <stddev>${CAMERA_STD_DEV}</stddev>
-          </noise>
-        </camera>
-        <plugin name="${prefix}_camera_controller" filename="libgazebo_ros_camera.so">
-          <alwaysOn>true</alwaysOn>
-          <updateRate>0.0</updateRate>
-          <cameraName>orca/${prefix}_camera</cameraName>
-          <imageTopicName>image_raw</imageTopicName>
-          <cameraInfoTopicName>camera_info</cameraInfoTopicName>
-          <frameName>${prefix}_camera_link</frameName>
-          <hackBaseline>0.07</hackBaseline> <!-- Um, not required for mono??? -->
-          <distortionK1>0.0</distortionK1>
-          <distortionK2>0.0</distortionK2>
-          <distortionK3>0.0</distortionK3>
-          <distortionT1>0.0</distortionT1>
-          <distortionT2>0.0</distortionT2>
-        </plugin>
-      </sensor>
-    </gazebo>
-  </xacro:macro>
-
-  <!-- Forward-facing camera: -->
-  <xacro:if value="${FORWARD_CAMERA_PLUGIN}">
-    <xacro:camera_plugin prefix="forward" width="1920" height="1080" horizontal_fov="1.4"/>
-  </xacro:if>
-
-  <!-- Stereo camera driver, tied to the left_camera_link -->
-  <xacro:if value="${STEREO_CAMERA_PLUGIN}">
-    <gazebo reference="left_camera_link">
-      <sensor type="multicamera" name="stereo">
-        <pose>0 0 0 0 0 0</pose>
-        <update_rate>${DOWN_CAMERA_FREQ}</update_rate>
-        <visualize>true</visualize>
-        <camera name="left">
-          <pose>0 0 0 0 0 0</pose>
-          <horizontal_fov>1.4</horizontal_fov>
-          <image>
-            <width>800</width>
-            <height>600</height>
-            <format>R8G8B8</format>
-          </image>
-          <clip>
-            <near>0.02</near>
-            <far>${CAMERA_FAR_CLIP}</far>
-          </clip>
-          <noise>
-            <type>gaussian</type>
-            <!-- Noise is sampled independently per pixel on each frame.
-                 That pixel's noise value is added to each of its color
-                 channels, which at that point lie in the range [0,1]. -->
-            <mean>0.0</mean>
-            <stddev>${CAMERA_STD_DEV}</stddev>
-          </noise>
-        </camera>
-        <camera name="right">
-          <pose>0 ${-STEREO_BASELINE} 0 0 0 0</pose>
-          <horizontal_fov>1.4</horizontal_fov>
-          <image>
-            <width>800</width>
-            <height>600</height>
-            <format>R8G8B8</format>
-          </image>
-          <clip>
-            <near>0.02</near>
-            <far>${CAMERA_FAR_CLIP}</far>
-          </clip>
-          <noise>
-            <type>gaussian</type>
-            <!-- Noise is sampled independently per pixel on each frame.
-                 That pixel's noise value is added to each of its color
-                 channels, which at that point lie in the range [0,1]. -->
-            <mean>0.0</mean>
-            <stddev>${CAMERA_STD_DEV}</stddev>
-          </noise>
-        </camera>
-        <plugin name="stereo_camera_controller" filename="libgazebo_ros_camera.so">
-          <!-- Omit camera_name, will default to sensor name -->
-          <!-- Default frame name is the link name (left_camera_link). Override to distinguish
-               between the link, which pitches forward pi/4, and the camera frame, which pitches
-               forward pi/2. Both cameras will use the same frame name -->
-          <frame_name>left_camera_frame</frame_name>
-          <!-- The baseline value is the distance between the 2 cameras. It shows up in the
-               camera info projection matrix. In theory it can be gleaned by looking at the
-               pose tags of the 2 cameras above, but in practice we need to set it using the
-               hack_baseline tag. -->
-          <hack_baseline>${STEREO_BASELINE}</hack_baseline>
-        </plugin>
-      </sensor>
     </gazebo>
   </xacro:if>
 

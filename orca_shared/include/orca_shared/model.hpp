@@ -43,8 +43,8 @@ namespace orca
 // roll and pitch are always 0
 
 #define MODEL_PARAMS \
-  CXT_MACRO_MEMBER(mdl_mass, double, 9.75) \
-  CXT_MACRO_MEMBER(mdl_volume, double, 0.01) \
+  CXT_MACRO_MEMBER(mdl_mass, double, 14.25) \
+  CXT_MACRO_MEMBER(mdl_volume, double, 0.0144) \
   CXT_MACRO_MEMBER(mdl_fluid_density, double, 997) \
   /* kg/m^3, 997 for freshwater, 1029 for seawater  */ \
   CXT_MACRO_MEMBER(mdl_thrust_scale, double, 0.7) \
@@ -86,9 +86,9 @@ struct Model
   // Vehicle constants, in the body frame (x forward, y left, z up)
   //=====================================================================================
 
-  static constexpr double ROV_DIM_X = 0.457;       // Length
-  static constexpr double ROV_DIM_Y = 0.338;       // Width
-  static constexpr double ROV_DIM_Z = 0.254;       // Height
+  static constexpr double ROV_DIM_X = 0.550;       // Length
+  static constexpr double ROV_DIM_Y = 0.364;       // Width
+  static constexpr double ROV_DIM_Z = 0.270;       // Height
 
   static constexpr double TETHER_DIAM = 0.008;
 

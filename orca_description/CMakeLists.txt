@@ -25,6 +25,10 @@ foreach(SIM_MODE IN ITEMS hw6 slam_test hw7)
   add_custom_target(generate_${SIM_MODE}_urdf ALL DEPENDS ${URDF_FILE})
 endforeach()
 
+install(DIRECTORY meshes
+  DESTINATION share/${PROJECT_NAME}
+)
+
 # Load & run linters listed in package.xml
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
